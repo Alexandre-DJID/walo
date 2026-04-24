@@ -1,55 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'services/isar_service.dart';
-import 'services/notification_service.dart';
-import 'core/constants/colors.dart';
-import 'ui/screens/dashboard_screen.dart';
+import 'package:isar/isar.dart';
+import 'package:path_provider/path_provider.dart';
+import 'models/habit.dart';
+import 'providers/habit_provider.dart';
+import 'ui/home_screen.dart';
 
-final isarServiceProvider = Provider<IsarService>((ref) {
-  throw UnimplementedError();
-});
-
-final notificationServiceProvider = Provider<NotificationService>((ref) {
-  throw UnimplementedError();
-});
-
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  final isarService = await IsarService.init();
-  final notificationService = NotificationService();
-  await notificationService.init();
+
+  final directory = await getApplicationDocumentsDirectory();
+  final isar = await Isar.open(
+    [HabitSchema],
+    directory: directory.path,
+  );
 
   runApp(
     ProviderScope(
       overrides: [
-        isarServiceProvider.overrideWithValue(isarService),
-        notificationServiceProvider.overrideWithValue(notificationService),
+        isarProvider.overrideWithValue(isar),
       ],
-      child: const WaloApp(),
+      child: const HabitsApp(),
     ),
   );
 }
 
-class WaloApp extends StatelessWidget {
-  const WaloApp({super.key});
+class HabitsApp extends StatelessWidget {
+  const HabitsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'WALO',
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: CyberColors.background,
-        textTheme: GoogleFonts.orbitronTextTheme(ThemeData.dark().textTheme),
-        colorScheme: const ColorScheme.dark(
-          primary: CyberColors.neonCyan,
-          secondary: CyberColors.neonMagenta,
-          surface: CyberColors.cardBackground,
+      title: 'Suivi d\'habitudes',
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.grey[100],
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.indigo,
+          backgroundColor: Colors.grey[100],
+          cardColor: Colors.white,
+        ).copyWith(
+          secondary: Colors.green[600],
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.indigo[900],
+          elevation: 1,
+          titleTextStyle: const TextStyle(
+            color: Colors.indigo,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
-      home: const DashboardScreen(),
+      home: const HomeScreen(),
     );
   }
 }

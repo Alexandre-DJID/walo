@@ -6,19 +6,19 @@ part 'habit.g.dart';
 class Habit {
   Id id = Isar.autoIncrement;
 
-  late String name;
-  
-  // Objectif quantitatif (ex: 20 pour 20 pages, 1 pour une habitude binaire)
-  late double goalValue;
-  
-  // Unité (ex: "pages", "litres", "sessions" ou "fait")
-  late String unit;
+  late String title;
 
-  // Fréquence : Liste des jours de la semaine (1 = Lundi, 7 = Dimanche)
-  late List<int> frequency;
+  late List<DateTime> completedDays = [];
 
-  DateTime createdAt = DateTime.now();
-
-  // On stocke le streak actuel pour un accès rapide
-  int currentStreak = 0;
+  @ignore
+  bool get isCompletedToday {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    return completedDays.any(
+      (day) =>
+          day.year == today.year &&
+          day.month == today.month &&
+          day.day == today.day,
+    );
+  }
 }
